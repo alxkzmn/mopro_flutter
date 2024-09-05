@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+import 'package:mopro_flutter/mopro_flutter.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'mopro_flutter_method_channel.dart';
@@ -23,7 +25,8 @@ abstract class MoproFlutterPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+  Future<Map<String, dynamic>?> generateProof(
+      String zkeyPath, Map<String, List<String>> inputs) {
+    throw UnimplementedError('generateProof() has not been implemented.');
   }
 }

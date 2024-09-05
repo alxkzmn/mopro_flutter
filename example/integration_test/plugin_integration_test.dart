@@ -6,7 +6,6 @@
 // For more information about Flutter integration tests, please see
 // https://docs.flutter.dev/cookbook/testing/integration/introduction
 
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -15,11 +14,16 @@ import 'package:mopro_flutter/mopro_flutter.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  //TODO better test
   testWidgets('getPlatformVersion test', (WidgetTester tester) async {
     final MoproFlutter plugin = MoproFlutter();
-    final String? version = await plugin.getPlatformVersion();
+    var inputs = <String, List<String>>{};
+    inputs["a"] = ["3"];
+    inputs["b"] = ["5"];
+    final GenerateProofResult? proofResult =
+        await plugin.generateProof("multiplier2_final.zkey", inputs);
     // The version string depends on the host platform running the test, so
     // just assert that some non-empty string is returned.
-    expect(version?.isNotEmpty, true);
+    expect(proofResult, isNotNull);
   });
 }
