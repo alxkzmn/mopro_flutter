@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -55,13 +57,37 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // The inputs is a base64 string
+    var inputs = _proofResult?.inputs ?? "";
+    // The proof is a base64 string
+    var proof = _proofResult?.proof ?? "";
+    // Decode the proof and inputs to see the actual values
+    var decodedProof = base64Decode(proof);
+    var decodedInputs = base64Decode(inputs);
+
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Flutter App With MoPro'),
         ),
-        body: Center(
-          child: Text('Proof result: $_proofResult\n'),
+        body: SingleChildScrollView(
+          child: Center(
+            child: _proofResult == null
+                ? const CircularProgressIndicator()
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Proof inputs: $decodedInputs'),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Proof: $decodedProof'),
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );
