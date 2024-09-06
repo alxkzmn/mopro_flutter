@@ -1,15 +1,10 @@
-# mopro_flutter
+# Cross-Platform Mobile ZKPs
 
-A new Flutter plugin project.
+Flutter, now the most popular cross-platform framework, has surpassed React Native in popularity over the past few years. Mopro Flutter shows an example of integrating the mobile ZK-proving into a Flutter app, allowing to streamline the creation of ZK-enabled mobile apps.
 
-## Getting Started
+# Running The Example App
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+- Open the project in VS Code
+- Open "Run and Debug"
+- Start an emulator (iOS/Android) or connect your phone
+- Select "example" in the run menu and press run
