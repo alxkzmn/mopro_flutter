@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:flutter/services.dart';
 
 import 'package:mopro_flutter/mopro_flutter.dart';
 
@@ -19,41 +19,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   GenerateProofResult? _proofResult;
   final _moproFlutterPlugin = MoproFlutter();
-
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    Map<String, dynamic>? proofResult;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      var inputs = <String, List<String>>{};
-      inputs["a"] = ["3"];
-      inputs["b"] = ["5"];
-      proofResult = await _moproFlutterPlugin.generateProof(
-          "assets/multiplier2_final.zkey", inputs);
-      print("Proof result: $proofResult");
-    } catch (e) {
-      print("Error: $e");
-      proofResult = null;
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _proofResult = proofResult == null
-          ? null
-          : GenerateProofResult(proofResult["proof"], proofResult["inputs"]);
-    });
-  }
+  bool isProving = false;
+  PlatformException? _error;
 
   @override
   Widget build(BuildContext context) {
@@ -71,23 +38,78 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Flutter App With MoPro'),
         ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: _proofResult == null
-                ? const CircularProgressIndicator()
-                : Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Proof inputs: $decodedInputs'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Proof: $decodedProof'),
-                      ),
-                    ],
-                  ),
-          ),
+        body: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            if (isProving) const CircularProgressIndicator(),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(_error.toString()),
+              ),
+            if (_proofResult != null)
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Proof inputs: $decodedInputs'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Proof: $decodedProof'),
+                    ),
+                  ],
+                ),
+              ),
+            Flexible(
+              flex: 1,
+              child: Container(),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: OutlinedButton(
+                      onPressed: () async {
+                        Map<String, dynamic>? proofResult;
+                        PlatformException? error;
+                        // Platform messages may fail, so we use a try/catch PlatformException.
+                        // We also handle the message potentially returning null.
+                        try {
+                          var inputs = <String, List<String>>{};
+                          inputs["a"] = ["3"];
+                          inputs["b"] = ["5"];
+                          proofResult = await _moproFlutterPlugin.generateProof(
+                              "assets/multiplier2_final.zkey", inputs);
+                          print("Proof result: $proofResult");
+                        } on PlatformException catch (e) {
+                          print("Error: $e");
+                          error = e;
+                          proofResult = null;
+                        }
+
+                        // If the widget was removed from the tree while the asynchronous platform
+                        // message was in flight, we want to discard the reply rather than calling
+                        // setState to update our non-existent appearance.
+                        if (!mounted) return;
+
+                        setState(() {
+                          _proofResult = proofResult == null
+                              ? null
+                              : GenerateProofResult(
+                                  proofResult["proof"], proofResult["inputs"]);
+                          _error = error;
+                        });
+                      },
+                      child: const Text("Generate Proof")),
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );
